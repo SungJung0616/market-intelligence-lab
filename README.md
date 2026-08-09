@@ -98,9 +98,15 @@ Completed:
 - Application and test package structure created
 - Linting, type-checking, and test tooling configured
 
+Implemented in the first data vertical slice:
+
+- FRED DGS10 collection with response validation
+- Deterministic local JSON artifacts
+- Unit tests isolated from the live provider
+- Minimal Streamlit and Plotly data preview
+
 Not yet implemented:
 
-- Data collection pipeline
 - Database schema
 - Market scoring methodology
 - Market intelligence engine
@@ -143,7 +149,7 @@ Technology supports the research process; it does not define the project.
 | Initial dashboard | Streamlit |
 | Visualization | Plotly or native Streamlit charts |
 | AI model and provider | To be defined |
-| Market data providers | To be defined |
+| Initial market data provider | FRED (DGS10) |
 | Deployment platform | To be defined |
 
 MongoDB is not planned for the initial version. It may be reconsidered if future requirements involve large volumes of unstructured news or document data.
@@ -211,6 +217,22 @@ uv run mypy .
 uv run pytest
 ```
 
+Copy `.env.example` to `.env`, add your personal FRED API key, and collect the initial dataset:
+
+```powershell
+uv run --env-file .env python -m market_intelligence_lab.jobs.collect_dgs10
+```
+
+Launch the local data preview:
+
+```powershell
+uv run streamlit run src/market_intelligence_lab/presentation/app.py
+```
+
+The generated JSON is stored under `data/raw/fred/dgs10/` and remains excluded from Git.
+This product uses the FRED® API but is not endorsed or certified by the Federal Reserve Bank
+of St. Louis.
+
 The local `.venv` directory is managed by uv and must not be committed. Runtime
 dependencies belong in `[project.dependencies]`; development-only tools belong in
 `[dependency-groups].dev`. Commit `uv.lock` whenever dependencies change.
@@ -274,13 +296,13 @@ defines its responsibility and prohibited concerns.
 
 ## Next Milestone
 
-Collect, validate, persist, and test the first approved market dataset.
+Define and validate the next market question using the proven data pipeline.
 
 The milestone includes:
 
-- Select one approved market dataset and provider.
-- Implement a minimal collector with response validation.
-- Save validated output as deterministic JSON with documented naming and location.
-- Test success, invalid-response, and failure behavior without live-network dependence.
+- Review the DGS10 preview and confirm the displayed baseline is useful.
+- Select the next evidence dimension without introducing a composite market score yet.
+- Define its provider, validation rules, historical baseline, and acceptance criteria in Notion.
+- Extend the pipeline with isolated tests before connecting it to broader intelligence.
 
-The immediate objective is not to produce investment signals. It is to prove a small, defensible, and testable data path for understanding the market.
+The immediate objective remains evidence quality, not investment signals or predictions.
