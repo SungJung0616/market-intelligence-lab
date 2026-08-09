@@ -40,6 +40,21 @@ scoring. `market_intelligence_lab.analysis` consumes those results to produce AI
 conflicting-signal summaries, historical context, and confidence notes. Analysis must never own
 or alter the underlying score calculations.
 
+## Product and Model Evolution
+
+The primary presentation remains simple and stable: current score and regime, historical
+baseline, change, major contributors, relevant events, and confidence. Detailed evidence is
+progressively disclosed rather than placed on the primary view.
+
+The intelligence model is expected to evolve as research improves its data, baselines,
+normalization, weights, event treatment, and confidence rules. Each material model change must:
+
+- have an explicit version and documented rationale;
+- reproduce a result from defined data and rules;
+- be compared against the previous version on fixed historical cases;
+- preserve the model version used for previously generated results; and
+- keep AI interpretation separate from deterministic score calculation.
+
 ## Testing Boundaries
 
 - `tests/unit/` isolates external systems and validates deterministic behavior.

@@ -55,6 +55,22 @@ Use AI to replace assumptions with evidence.
 
 Turn complex market data into clear and actionable insights. Understand the market through data rather than emotion, and continuously improve the quality of investment decisions through learning and validation.
 
+## Product Principles
+
+> **Simple on the surface. Rigorous underneath.**
+
+The primary view should let a person understand the current market environment within seconds. It should lead with:
+
+- Today's market score and regime
+- Change versus the previous period and a defined historical baseline
+- The strongest positive and negative contributors
+- Relevant events and their measured impact
+- Confidence, uncertainty, and conflicting signals
+
+Detailed indicators and charts should remain available on demand without overwhelming the primary view. The interface should stay stable and intuitive while the intelligence model evolves through research.
+
+Scoring is a living research model, not a fixed claim of truth. Data inputs, baselines, normalization rules, weights, event adjustments, and confidence methods may improve over time, but every change must remain explicit, versioned, reproducible, and historically validated.
+
 ## What Market Intelligence Lab Is Not
 
 Market Intelligence Lab is not:
