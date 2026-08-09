@@ -7,3 +7,6 @@ presentation logic.
 
 The `collect_fred` entry point accepts an explicitly supported FRED series ID and connects
 collection to local JSON persistence. It does not calculate or interpret market meaning.
+
+The `collect_tiingo` entry point has the same boundary for the approved SPY, QQQ, DIA, and IWM
+representative ETFs. Provider data is stored locally and is not committed or redistributed.

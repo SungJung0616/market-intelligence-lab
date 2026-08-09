@@ -105,6 +105,17 @@ Implemented in the first data vertical slice:
 - Unit tests isolated from the live provider
 - Minimal Streamlit and Plotly data preview
 
+Current data coverage:
+
+- U.S. equity evidence: SPY, QQQ, DIA, and IWM adjusted close from Tiingo
+- Rates: DGS2 and DGS10 from FRED
+- Risk and currency: VIXCLS and DTWEXBGS from FRED
+- A local Streamlit dashboard split into equity and macro evidence views
+
+SPY, QQQ, DIA, and IWM are liquid **representative ETFs**. They are not the underlying S&P 500,
+Nasdaq-100, Dow Jones Industrial Average, or Russell 2000 indices. The project uses their
+adjusted closes as observable research evidence and does not present them as recommendations.
+
 Not yet implemented:
 
 - Database schema
@@ -113,7 +124,8 @@ Not yet implemented:
 - AI analysis engine
 - Research dashboard
 
-The project foundation is complete. No market-data collection, scoring, or AI-analysis behavior has been implemented yet.
+The project foundation and first market-data evidence layer are complete. Scoring and AI-analysis
+behavior have not been implemented yet.
 
 ## Market Intelligence Framework
 
@@ -149,7 +161,7 @@ Technology supports the research process; it does not define the project.
 | Initial dashboard | Streamlit |
 | Visualization | Plotly or native Streamlit charts |
 | AI model and provider | To be defined |
-| Initial market data provider | FRED (DGS10) |
+| Initial market data providers | FRED and Tiingo |
 | Deployment platform | To be defined |
 
 MongoDB is not planned for the initial version. It may be reconsidered if future requirements involve large volumes of unstructured news or document data.
@@ -217,11 +229,18 @@ uv run mypy .
 uv run pytest
 ```
 
-Copy `.env.example` to `.env`, add your personal FRED API key, and collect the initial dataset:
+Copy `.env.example` to `.env`, add your personal FRED and Tiingo API keys, and collect the
+approved datasets:
 
 ```powershell
 uv run --env-file .env python -m market_intelligence_lab.jobs.collect_fred DGS10
+uv run --env-file .env python -m market_intelligence_lab.jobs.collect_fred DGS2
 uv run --env-file .env python -m market_intelligence_lab.jobs.collect_fred VIXCLS
+uv run --env-file .env python -m market_intelligence_lab.jobs.collect_fred DTWEXBGS
+uv run --env-file .env python -m market_intelligence_lab.jobs.collect_tiingo SPY
+uv run --env-file .env python -m market_intelligence_lab.jobs.collect_tiingo QQQ
+uv run --env-file .env python -m market_intelligence_lab.jobs.collect_tiingo DIA
+uv run --env-file .env python -m market_intelligence_lab.jobs.collect_tiingo IWM
 ```
 
 Launch the local data preview:
@@ -230,9 +249,12 @@ Launch the local data preview:
 uv run streamlit run src/market_intelligence_lab/presentation/app.py
 ```
 
-Generated JSON is stored under `data/raw/fred/<series-id>/` and remains excluded from Git.
+Generated JSON is stored under `data/raw/<provider>/<series-id>/` and remains excluded from Git.
 This product uses the FRED® API but is not endorsed or certified by the Federal Reserve Bank
 of St. Louis.
+
+Tiingo data is used locally for personal research. It is not committed to the public repository
+or redistributed. Users must supply their own API key and follow Tiingo's current terms.
 
 The local `.venv` directory is managed by uv and must not be committed. Runtime
 dependencies belong in `[project.dependencies]`; development-only tools belong in
@@ -297,13 +319,13 @@ defines its responsibility and prohibited concerns.
 
 ## Next Milestone
 
-Define and validate the next market question using the proven data pipeline.
+Validate the expanded market evidence before defining any composite score.
 
 The milestone includes:
 
-- Review the DGS10 preview and confirm the displayed baseline is useful.
-- Select the next evidence dimension without introducing a composite market score yet.
-- Define its provider, validation rules, historical baseline, and acceptance criteria in Notion.
-- Extend the pipeline with isolated tests before connecting it to broader intelligence.
+- Review whether adjusted-close and historical-mean previews communicate the evidence clearly.
+- Confirm data freshness and missing-observation behavior across both providers.
+- Define the first deterministic comparison or regime input in Notion.
+- Keep score calculations in `intelligence`; future AI explanation belongs in `analysis`.
 
 The immediate objective remains evidence quality, not investment signals or predictions.
