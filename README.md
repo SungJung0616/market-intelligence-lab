@@ -100,7 +100,7 @@ Completed:
 
 Implemented in the first data vertical slice:
 
-- FRED DGS10 collection with response validation
+- FRED DGS10 and VIXCLS collection with response validation
 - Deterministic local JSON artifacts
 - Unit tests isolated from the live provider
 - Minimal Streamlit and Plotly data preview
@@ -221,6 +221,7 @@ Copy `.env.example` to `.env`, add your personal FRED API key, and collect the i
 
 ```powershell
 uv run --env-file .env python -m market_intelligence_lab.jobs.collect_fred DGS10
+uv run --env-file .env python -m market_intelligence_lab.jobs.collect_fred VIXCLS
 ```
 
 Launch the local data preview:
@@ -229,7 +230,7 @@ Launch the local data preview:
 uv run streamlit run src/market_intelligence_lab/presentation/app.py
 ```
 
-The generated JSON is stored under `data/raw/fred/dgs10/` and remains excluded from Git.
+Generated JSON is stored under `data/raw/fred/<series-id>/` and remains excluded from Git.
 This product uses the FRED® API but is not endorsed or certified by the Federal Reserve Bank
 of St. Louis.
 

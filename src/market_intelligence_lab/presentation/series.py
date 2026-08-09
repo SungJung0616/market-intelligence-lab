@@ -1,4 +1,4 @@
-"""Pure presentation helpers for the initial DGS10 data preview."""
+"""Pure presentation helpers for market-series data previews."""
 
 from dataclasses import dataclass
 from statistics import fmean
@@ -26,13 +26,17 @@ def summarize(data: SeriesData) -> SeriesSummary:
     )
 
 
-def build_figure(data: SeriesData, historical_mean: float) -> go.Figure:
+def build_figure(
+    data: SeriesData,
+    historical_mean: float,
+    yaxis_title: str,
+) -> go.Figure:
     figure = go.Figure(
         go.Scatter(
             x=[observation.date for observation in data.observations],
             y=[observation.value for observation in data.observations],
             mode="lines",
-            name="DGS10",
+            name=data.series_id,
             line={"color": "#2563eb", "width": 2},
         )
     )
@@ -46,7 +50,7 @@ def build_figure(data: SeriesData, historical_mean: float) -> go.Figure:
         margin={"l": 0, "r": 0, "t": 30, "b": 0},
         height=430,
         hovermode="x unified",
-        yaxis_title="Percent",
+        yaxis_title=yaxis_title,
         xaxis_title=None,
         template="plotly_white",
     )
