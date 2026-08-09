@@ -10,9 +10,14 @@ from market_intelligence_lab.storage.json_store import save_series
 
 SUPPORTED_TICKERS = {
     "DIA": date(2016, 1, 1),
+    "GLD": date(2016, 1, 1),
+    "HYG": date(2016, 1, 1),
     "IWM": date(2016, 1, 1),
+    "LQD": date(2016, 1, 1),
     "QQQ": date(2016, 1, 1),
     "SPY": date(2016, 1, 1),
+    "TLT": date(2016, 1, 1),
+    "USO": date(2016, 1, 1),
 }
 
 
@@ -22,7 +27,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         "ticker",
         type=str.upper,
         choices=sorted(SUPPORTED_TICKERS),
-        help="Representative ETF ticker to collect",
+        help="Approved market-evidence ETF ticker to collect",
     )
     return parser.parse_args(argv)
 

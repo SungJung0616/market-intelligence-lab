@@ -4,7 +4,7 @@ from market_intelligence_lab.jobs.collect_tiingo import parse_args
 
 
 def test_parse_args_accepts_supported_tickers_case_insensitively() -> None:
-    for ticker in ("spy", "qqq", "dia", "iwm"):
+    for ticker in ("spy", "qqq", "dia", "iwm", "gld", "tlt", "hyg", "lqd", "uso"):
         assert parse_args([ticker]).ticker == ticker.upper()
 
 
