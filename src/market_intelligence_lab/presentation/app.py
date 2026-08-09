@@ -43,6 +43,59 @@ MACRO_PREVIEWS = (
     PreviewConfig("FRED", "DTWEXBGS", "Nominal Broad U.S. Dollar Index", "", "", "pts", "Index level", "Trade-weighted broad U.S. dollar index reported through FRED."),
 )
 
+CROSS_ASSET_PREVIEWS = (
+    PreviewConfig(
+        "Tiingo",
+        "GLD",
+        "Gold Representative ETF",
+        "$",
+        "",
+        "$",
+        "Adjusted close",
+        "GLD adjusted close as observable gold evidence; not the spot gold price.",
+    ),
+    PreviewConfig(
+        "Tiingo",
+        "TLT",
+        "Long-Term Treasury Representative ETF",
+        "$",
+        "",
+        "$",
+        "Adjusted close",
+        "TLT adjusted close as observable long-duration Treasury evidence.",
+    ),
+    PreviewConfig(
+        "Tiingo",
+        "HYG",
+        "High-Yield Credit Representative ETF",
+        "$",
+        "",
+        "$",
+        "Adjusted close",
+        "HYG adjusted close as observable high-yield credit-risk evidence.",
+    ),
+    PreviewConfig(
+        "Tiingo",
+        "LQD",
+        "Investment-Grade Credit Representative ETF",
+        "$",
+        "",
+        "$",
+        "Adjusted close",
+        "LQD adjusted close as observable investment-grade credit evidence.",
+    ),
+    PreviewConfig(
+        "Tiingo",
+        "USO",
+        "Oil Representative ETF",
+        "$",
+        "",
+        "$",
+        "Adjusted close",
+        "USO adjusted close as observable oil-market evidence; not the spot oil price.",
+    ),
+)
+
 
 def _format_value(value: float, config: PreviewConfig) -> str:
     return f"{config.value_prefix}{value:.2f}{config.value_suffix}"
@@ -89,7 +142,9 @@ st.set_page_config(page_title="Market Intelligence Lab", page_icon="📈", layou
 st.title("Market Intelligence Lab")
 st.caption("Simple on the surface. Rigorous underneath.")
 
-equities_tab, macro_tab = st.tabs(["U.S. Market ETFs", "Rates, Volatility & Dollar"])
+equities_tab, macro_tab, cross_asset_tab = st.tabs(
+    ["U.S. Market ETFs", "Rates, Volatility & Dollar", "Cross-Asset Evidence"]
+)
 with equities_tab:
     st.caption("Liquid representative ETFs are used as observable market evidence—not as index substitutes or investment recommendations.")
     render_group(EQUITY_PREVIEWS)
@@ -97,5 +152,12 @@ with equities_tab:
 with macro_tab:
     st.caption("Macro and risk evidence from official FRED series.")
     render_group(MACRO_PREVIEWS)
+
+with cross_asset_tab:
+    st.caption(
+        "Representative ETFs provide observable gold, oil, duration, and credit evidence—"
+        "not spot prices, scores, or investment recommendations."
+    )
+    render_group(CROSS_ASSET_PREVIEWS)
 
 st.info("Data-quality previews only — not market scores, predictions, or investment signals.")

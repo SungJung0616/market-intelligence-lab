@@ -108,9 +108,10 @@ Implemented in the first data vertical slice:
 Current data coverage:
 
 - U.S. equity evidence: SPY, QQQ, DIA, and IWM adjusted close from Tiingo
+- Cross-asset evidence: GLD, TLT, HYG, LQD, and USO adjusted close from Tiingo
 - Rates: DGS2 and DGS10 from FRED
 - Risk and currency: VIXCLS and DTWEXBGS from FRED
-- A local Streamlit dashboard split into equity and macro evidence views
+- A local Streamlit dashboard split into equity, macro, and cross-asset evidence views
 
 SPY, QQQ, DIA, and IWM are liquid **representative ETFs**. They are not the underlying S&P 500,
 Nasdaq-100, Dow Jones Industrial Average, or Russell 2000 indices. The project uses their
@@ -241,6 +242,11 @@ uv run --env-file .env python -m market_intelligence_lab.jobs.collect_tiingo SPY
 uv run --env-file .env python -m market_intelligence_lab.jobs.collect_tiingo QQQ
 uv run --env-file .env python -m market_intelligence_lab.jobs.collect_tiingo DIA
 uv run --env-file .env python -m market_intelligence_lab.jobs.collect_tiingo IWM
+uv run --env-file .env python -m market_intelligence_lab.jobs.collect_tiingo GLD
+uv run --env-file .env python -m market_intelligence_lab.jobs.collect_tiingo TLT
+uv run --env-file .env python -m market_intelligence_lab.jobs.collect_tiingo HYG
+uv run --env-file .env python -m market_intelligence_lab.jobs.collect_tiingo LQD
+uv run --env-file .env python -m market_intelligence_lab.jobs.collect_tiingo USO
 ```
 
 Launch the local data preview:
