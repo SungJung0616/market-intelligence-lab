@@ -9,7 +9,9 @@ from market_intelligence_lab.collection.fred import FredClient
 from market_intelligence_lab.storage.json_store import save_series
 
 SUPPORTED_SERIES = {
+    "DGS2": date(2016, 1, 1),
     "DGS10": date(2016, 1, 1),
+    "DTWEXBGS": date(2016, 1, 1),
     "VIXCLS": date(2016, 1, 1),
 }
 
@@ -39,4 +41,3 @@ def main(argv: Sequence[str] | None = None) -> None:
 
 if __name__ == "__main__":
     main()
-
