@@ -220,7 +220,7 @@ uv run pytest
 Copy `.env.example` to `.env`, add your personal FRED API key, and collect the initial dataset:
 
 ```powershell
-uv run --env-file .env python -m market_intelligence_lab.jobs.collect_dgs10
+uv run --env-file .env python -m market_intelligence_lab.jobs.collect_fred DGS10
 ```
 
 Launch the local data preview:
