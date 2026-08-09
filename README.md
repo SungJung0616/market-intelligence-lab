@@ -1,16 +1,16 @@
-# StockAI
+# Market Intelligence Lab
 
 > **We don't predict stocks. We decode the market.**
 
-StockAI is an AI research platform that transforms complex financial data into objective scores, explainable insights, and actionable market intelligence.
+A testable, explainable market research platform focused on evidence—not stock prediction.
 
-Its purpose is not to predict individual stocks or replace investment decisions. StockAI helps investors understand the market environment before deciding where—and whether—to invest.
+Market Intelligence Lab transforms complex financial data into objective scores, explainable insights, and actionable market intelligence. Its purpose is not to predict individual stocks or replace investment decisions. It helps investors understand the market environment before deciding where—and whether—to invest.
 
 ## Project Overview
 
 Financial markets produce signals across indexes, interest rates, volatility, currencies, commodities, sectors, market breadth, capital flows, sentiment, macroeconomic data, and events.
 
-These signals are related, but they are usually presented through separate tools and interpreted manually. StockAI brings them together into a measurable and explainable market intelligence system.
+These signals are related, but they are usually presented through separate tools and interpreted manually. Market Intelligence Lab brings them together into a measurable and explainable market intelligence system.
 
 The platform is intended to answer questions such as:
 
@@ -37,7 +37,7 @@ Understanding the market currently requires reviewing dozens of disconnected ind
 
 Looking at these indicators independently can lead to conclusions shaped by narrative, recency, or emotion.
 
-StockAI exists to replace that fragmented process with a repeatable research framework. It will measure market conditions, track how they change, and explain the evidence behind every conclusion.
+Market Intelligence Lab exists to replace that fragmented process with a repeatable research framework. It will measure market conditions, track how they change, and explain the evidence behind every conclusion.
 
 A result should not end with:
 
@@ -55,9 +55,9 @@ Use AI to replace assumptions with evidence.
 
 Turn complex market data into clear and actionable insights. Understand the market through data rather than emotion, and continuously improve the quality of investment decisions through learning and validation.
 
-## What StockAI Is Not
+## What Market Intelligence Lab Is Not
 
-StockAI is not:
+Market Intelligence Lab is not:
 
 - A stock prediction engine
 - A stock recommendation service
@@ -69,7 +69,7 @@ AI should explain the market, identify evidence and risks, and communicate uncer
 
 ## Current Project Status
 
-StockAI is currently in **Phase 1 — Project Foundation**.
+Market Intelligence Lab is currently completing **Phase 1 — Project Foundation**.
 
 Completed:
 
@@ -78,11 +78,12 @@ Completed:
 - Core technology decisions recorded
 - Public Git repository established
 - Development rules created for human and AI contributors
+- Python 3.13 and uv development environment configured
+- Application and test package structure created
+- Linting, type-checking, and test tooling configured
 
 Not yet implemented:
 
-- Development environment
-- Application structure
 - Data collection pipeline
 - Database schema
 - Market scoring methodology
@@ -90,7 +91,7 @@ Not yet implemented:
 - AI analysis engine
 - Research dashboard
 
-No application code has been written yet.
+The project foundation is complete. No market-data collection, scoring, or AI-analysis behavior has been implemented yet.
 
 ## Market Intelligence Framework
 
@@ -162,7 +163,7 @@ The AI analysis should:
 
 ## Development Environment
 
-StockAI uses CPython 3.13 and [uv](https://docs.astral.sh/uv/) for Python version,
+Market Intelligence Lab uses CPython 3.13 and [uv](https://docs.astral.sh/uv/) for Python version,
 virtual environment, dependency, and lockfile management.
 
 ### Prerequisites
@@ -179,8 +180,8 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 Restart the terminal after installation, then prepare the project environment:
 
 ```powershell
-git clone https://github.com/SungJung0616/StockAI.git
-cd StockAI
+git clone https://github.com/SungJung0616/market-intelligence-lab.git
+cd market-intelligence-lab
 uv python install 3.13
 uv sync
 ```
@@ -232,8 +233,8 @@ Combine validated market intelligence and explainable AI analysis into a structu
 ## Repository Structure
 
 ```text
-StockAI/
-├── src/stockai/
+market-intelligence-lab/
+├── src/market_intelligence_lab/
 │   ├── collection/    # External data retrieval and validation
 │   ├── storage/       # PostgreSQL, JSONB, and artifact persistence
 │   ├── intelligence/  # Deterministic market intelligence
@@ -257,19 +258,13 @@ defines its responsibility and prohibited concerns.
 
 ## Next Milestone
 
-Define the first version of the market intelligence framework and establish the foundation for the basic data pipeline.
+Collect, validate, persist, and test the first approved market dataset.
 
-The milestone should define:
+The milestone includes:
 
-- Initial market dimensions
-- Minimum data required for each dimension
-- Data-source selection criteria
-- Risk-On, Neutral, and Risk-Off methodology
-- Scoring transparency and confidence rules
-- Historical validation cases
-- Python development environment
-- Initial application and test structure
-- PostgreSQL connectivity
-- Collection validation, normalization, deduplication, and status tracking
+- Select one approved market dataset and provider.
+- Implement a minimal collector with response validation.
+- Save validated output as deterministic JSON with documented naming and location.
+- Test success, invalid-response, and failure behavior without live-network dependence.
 
-The immediate objective is not to produce investment signals. It is to build a defensible and testable foundation for understanding the market.
+The immediate objective is not to produce investment signals. It is to prove a small, defensible, and testable data path for understanding the market.

@@ -1,7 +1,7 @@
 [project]
-name = "stockai"
+name = "market-intelligence-lab"
 version = "0.1.0"
-description = "AI research platform for explainable market intelligence"
+description = "Testable, explainable market research platform focused on evidence"
 readme = "README.md"
 requires-python = ">=3.13,<3.14"
 dependencies = []

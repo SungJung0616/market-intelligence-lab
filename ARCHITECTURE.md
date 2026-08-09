@@ -1,7 +1,7 @@
-# StockAI Architecture
+# Market Intelligence Lab Architecture
 
 Notion is the source of truth for architectural decisions. This document maps the approved
-StockAI Version 0.1 architecture to repository boundaries.
+Market Intelligence Lab Version 0.1 architecture to repository boundaries.
 
 ## System Flow
 
@@ -25,18 +25,18 @@ Scheduled jobs coordinate this flow without owning its business logic.
 
 | Package | Responsibility |
 |---|---|
-| `stockai.collection` | Retrieve, validate, normalize, and deduplicate external data |
-| `stockai.storage` | Persist approved structured and flexible data |
-| `stockai.intelligence` | Calculate deterministic market intelligence |
-| `stockai.analysis` | Explain evidence, risks, comparisons, and confidence |
-| `stockai.presentation` | Present research through human-facing interfaces |
-| `stockai.jobs` | Orchestrate scheduled workflows |
+| `market_intelligence_lab.collection` | Retrieve, validate, normalize, and deduplicate external data |
+| `market_intelligence_lab.storage` | Persist approved structured and flexible data |
+| `market_intelligence_lab.intelligence` | Calculate deterministic market intelligence |
+| `market_intelligence_lab.analysis` | Explain evidence, risks, comparisons, and confidence |
+| `market_intelligence_lab.presentation` | Present research through human-facing interfaces |
+| `market_intelligence_lab.jobs` | Orchestrate scheduled workflows |
 
 Dependencies should flow from orchestration toward explicit interfaces. Data-provider,
 persistence, intelligence, AI, and presentation concerns must remain separable and testable.
 
-`stockai.intelligence` exclusively owns deterministic market calculations and scoring.
-`stockai.analysis` consumes those results to produce AI-assisted explanations, risks,
+`market_intelligence_lab.intelligence` exclusively owns deterministic market calculations and
+scoring. `market_intelligence_lab.analysis` consumes those results to produce AI-assisted explanations, risks,
 conflicting-signal summaries, historical context, and confidence notes. Analysis must never own
 or alter the underlying score calculations.
 

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines how AI agents implement changes in StockAI. Notion is the source of truth for the project's Goal, Vision, Roadmap, and Architecture.
+This document defines how AI agents implement changes in Market Intelligence Lab. Notion is the source of truth for the project's Goal, Vision, Roadmap, and Architecture.
 
 ## Development Principles
 

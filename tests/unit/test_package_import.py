@@ -1,4 +1,4 @@
-def test_stockai_package_can_be_imported() -> None:
-    import stockai
+def test_market_intelligence_lab_package_can_be_imported() -> None:
+    import market_intelligence_lab
 
-    assert stockai is not None
+    assert market_intelligence_lab is not None
