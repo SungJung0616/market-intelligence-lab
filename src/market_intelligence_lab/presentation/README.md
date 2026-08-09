@@ -11,3 +11,6 @@ Treasuries, high-yield credit, and investment-grade credit. Each preview shows t
 prior-observation change, historical mean, and trend. ETF views use adjusted close and are
 explicitly distinguished from underlying indices or spot prices. These previews are not market
 scores, predictions, or investment signals.
+
+Bitcoin is presented in its own tab because it trades continuously rather than in an
+exchange-traded market session. The preview uses completed UTC daily BTC-USD closes.

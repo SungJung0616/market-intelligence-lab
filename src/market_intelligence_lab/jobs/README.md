@@ -11,3 +11,6 @@ collection to local JSON persistence. It does not calculate or interpret market 
 The `collect_tiingo` entry point has the same boundary for the approved SPY, QQQ, DIA, IWM,
 GLD, TLT, HYG, LQD, and USO representative ETFs. Provider data is stored locally and is not
 committed or redistributed.
+
+The `collect_coinbase` entry point collects only public BTC-USD daily candles. It requires no
+API key, wallet, account access, or trading permission and stores only completed UTC days.

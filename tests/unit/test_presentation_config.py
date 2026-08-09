@@ -1,4 +1,5 @@
 from market_intelligence_lab.presentation.app import (
+    BITCOIN_PREVIEWS,
     CROSS_ASSET_PREVIEWS,
     EQUITY_PREVIEWS,
     MACRO_PREVIEWS,
@@ -24,6 +25,9 @@ def test_dashboard_covers_approved_market_evidence() -> None:
         ("Tiingo", "HYG"),
         ("Tiingo", "LQD"),
         ("Tiingo", "USO"),
+    }
+    assert {(preview.source, preview.series_id) for preview in BITCOIN_PREVIEWS} == {
+        ("Coinbase", "BTC-USD")
     }
 
 

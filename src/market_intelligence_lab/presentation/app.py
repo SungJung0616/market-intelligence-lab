@@ -96,6 +96,19 @@ CROSS_ASSET_PREVIEWS = (
     ),
 )
 
+BITCOIN_PREVIEWS = (
+    PreviewConfig(
+        "Coinbase",
+        "BTC-USD",
+        "Bitcoin · U.S. Dollar",
+        "$",
+        "",
+        "$",
+        "UTC daily close",
+        "Completed Coinbase BTC-USD UTC daily close from a continuously traded 24×7 market.",
+    ),
+)
+
 
 def _format_value(value: float, config: PreviewConfig) -> str:
     return f"{config.value_prefix}{value:.2f}{config.value_suffix}"
@@ -142,8 +155,13 @@ st.set_page_config(page_title="Market Intelligence Lab", page_icon="📈", layou
 st.title("Market Intelligence Lab")
 st.caption("Simple on the surface. Rigorous underneath.")
 
-equities_tab, macro_tab, cross_asset_tab = st.tabs(
-    ["U.S. Market ETFs", "Rates, Volatility & Dollar", "Cross-Asset Evidence"]
+equities_tab, macro_tab, cross_asset_tab, bitcoin_tab = st.tabs(
+    [
+        "U.S. Market ETFs",
+        "Rates, Volatility & Dollar",
+        "Cross-Asset Evidence",
+        "Bitcoin Evidence",
+    ]
 )
 with equities_tab:
     st.caption("Liquid representative ETFs are used as observable market evidence—not as index substitutes or investment recommendations.")
@@ -159,5 +177,12 @@ with cross_asset_tab:
         "not spot prices, scores, or investment recommendations."
     )
     render_group(CROSS_ASSET_PREVIEWS)
+
+with bitcoin_tab:
+    st.caption(
+        "Bitcoin trades continuously. This view uses only completed UTC daily candles and is "
+        "kept separate from exchange-traded market sessions."
+    )
+    render_group(BITCOIN_PREVIEWS)
 
 st.info("Data-quality previews only — not market scores, predictions, or investment signals.")
