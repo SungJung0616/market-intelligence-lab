@@ -3,12 +3,18 @@
 Higher scores mean lower inflation pressure. They do not imply Risk-On.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from datetime import date
+from math import sqrt
 from statistics import median
 
 from market_intelligence_lab.collection.models import Observation, SeriesData
 
-VERSION = "inflation-v1"
+VERSION = "inflation-v1.1"
+OFFICIAL_STRUCTURAL_GAPS = {
+    "CPIAUCSL": (date(2025, 10, 1),),
+    "CPILFESL": (date(2025, 10, 1),),
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -69,6 +75,8 @@ class IndicatorResult:
     robust_z: float | None
     extreme_flag: str
     deflation_flag: bool
+    imputed_dates: tuple[str, ...]
+    data_quality_note: str | None
     calculation_version: str = VERSION
 
 
@@ -78,6 +86,7 @@ class InflationResult:
     condition: str
     pressure_label: str
     indicators: tuple[IndicatorResult, ...]
+    uses_imputed_data: bool
     market_bias: None = None
     vintage_safe: bool = False
     calculation_version: str = VERSION
@@ -129,11 +138,37 @@ def _validate_months(values: tuple[Observation, ...]) -> None:
         raise ValueError("Inflation index values must be positive")
 
 
+def _apply_structural_gap_policy(series: SeriesData) -> tuple[SeriesData, tuple[str, ...]]:
+    """Fill only pre-approved official gaps without mutating the collected artifact."""
+    approved = set(OFFICIAL_STRUCTURAL_GAPS.get(series.series_id, ()))
+    if not approved:
+        return series, ()
+    observations = list(series.observations)
+    imputed: list[str] = []
+    for previous, current in zip(observations, observations[1:]):
+        previous_month = previous.date.year * 12 + previous.date.month
+        current_month = current.date.year * 12 + current.date.month
+        if current_month - previous_month != 2:
+            continue
+        missing_month_number = previous_month + 1
+        missing = date(
+            (missing_month_number - 1) // 12,
+            (missing_month_number - 1) % 12 + 1,
+            1,
+        )
+        if missing in approved:
+            observations.append(Observation(missing, sqrt(previous.value * current.value)))
+            imputed.append(missing.isoformat())
+    observations.sort(key=lambda item: item.date)
+    return replace(series, observations=tuple(observations)), tuple(imputed)
+
+
 def score_indicator(series: SeriesData) -> IndicatorResult:
     config = CONFIGS.get(series.series_id)
     if config is None:
         raise ValueError(f"Unsupported inflation series: {series.series_id}")
-    observations = series.observations
+    prepared, imputed_dates = _apply_structural_gap_policy(series)
+    observations = prepared.observations
     _validate_months(observations)
     current = observations[-1].value
     mom = (current / observations[-2].value - 1) * 100
@@ -181,6 +216,12 @@ def score_indicator(series: SeriesData) -> IndicatorResult:
         robust_z,
         extreme,
         yoy < 0 or annualized_3m < 0,
+        imputed_dates,
+        (
+            "Official 2025-10 CPI gap estimated with the geometric mean of adjacent indexes."
+            if imputed_dates
+            else None
+        ),
     )
 
 
@@ -207,4 +248,10 @@ def calculate_inflation(series_by_id: dict[str, SeriesData]) -> InflationResult:
         "Mixed": "Mixed",
         "Reaccelerating": "Higher",
     }[condition]
-    return InflationResult(score, condition, pressure_label, results)
+    return InflationResult(
+        score,
+        condition,
+        pressure_label,
+        results,
+        any(result.imputed_dates for result in results),
+    )

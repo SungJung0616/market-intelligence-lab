@@ -13,8 +13,15 @@ Higher scores mean **lower inflation pressure**. `Cooling` therefore produces a 
 `Reaccelerating` produces a lower score. This is not a Risk-On/Off or investment signal.
 
 The calculation requires all four series and 64 contiguous monthly observations. Missing months
-make the combined result unavailable; values are never interpolated and weights are never silently
-renormalized. Version 1 uses latest revised FRED data and is not vintage-safe.
+normally make the combined result unavailable, and weights are never silently renormalized.
+
+One explicit structural-gap exception exists: October 2025 CPI and Core CPI were not published
+because of the federal funding lapse. Version 1.1 estimates that month during calculation using the
+geometric mean of the adjacent September and November index levels, matching the approach BLS
+documented for seasonal-adjustment continuity. Raw FRED artifacts are never modified. Results expose
+the imputed date and a data-quality note. Any other missing month remains an error.
+
+Version 1.1 uses latest revised FRED data and is not vintage-safe.
 
 Owns deterministic market direction, sector rotation, macro, breadth, money-flow, sentiment,
 event-risk calculations, and market scoring.

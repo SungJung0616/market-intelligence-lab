@@ -26,11 +26,11 @@ def test_score_indicator_exposes_three_weighted_components() -> None:
         0.5 * result.current_pressure + 0.3 * result.trend + 0.2 * result.recent_5y_position
     )
     assert result.regime == "Stable"
-    assert result.calculation_version == "inflation-v1"
+    assert result.calculation_version == "inflation-v1.1"
 
 
 def test_score_indicator_requires_64_contiguous_months() -> None:
-    series = _series("CPIAUCSL")
+    series = _series("PCEPI")
     with pytest.raises(ValueError, match="64 monthly"):
         score_indicator(
             SeriesData(
@@ -38,6 +38,24 @@ def test_score_indicator_requires_64_contiguous_months() -> None:
             )
         )
     broken = series.observations[:50] + series.observations[51:]
+    with pytest.raises(ValueError, match="contiguous"):
+        score_indicator(SeriesData(series.source, series.series_id, series.collected_at, broken))
+
+
+def test_approved_october_2025_cpi_gap_is_imputed_only_during_calculation() -> None:
+    series = _series("CPIAUCSL")
+    without_october = tuple(item for item in series.observations if item.date != date(2025, 10, 1))
+    result = score_indicator(
+        SeriesData(series.source, series.series_id, series.collected_at, without_october)
+    )
+    assert result.imputed_dates == ("2025-10-01",)
+    assert result.data_quality_note is not None
+    assert len(without_october) == len(series.observations) - 1
+
+
+def test_unapproved_gap_remains_an_error() -> None:
+    series = _series("CPIAUCSL")
+    broken = tuple(item for item in series.observations if item.date != date(2025, 9, 1))
     with pytest.raises(ValueError, match="contiguous"):
         score_indicator(SeriesData(series.source, series.series_id, series.collected_at, broken))
 
@@ -59,3 +77,4 @@ def test_combined_score_uses_relief_direction() -> None:
     assert result.pressure_label == "Lower"
     assert result.market_bias is None
     assert result.vintage_safe is False
+    assert result.uses_imputed_data is False
