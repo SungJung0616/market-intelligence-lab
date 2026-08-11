@@ -5,6 +5,7 @@ from pathlib import Path
 
 import streamlit as st
 
+from market_intelligence_lab.analysis.inflation_explanation import explain_inflation
 from market_intelligence_lab.presentation.series import build_figure, summarize
 from market_intelligence_lab.storage.inflation_store import (
     InflationArtifact,
@@ -242,9 +243,25 @@ def render_inflation() -> None:
     pressure_col.metric("Inflation Pressure", result.pressure_label)
     st.progress(result.score / 100)
 
+    explanation = explain_inflation(result)
+    st.subheader("Why this score?")
+    st.markdown(f"**{explanation.headline}** {explanation.summary}")
+    evidence_col, caution_col = st.columns(2)
+    evidence_col.success(explanation.strongest_evidence)
+    caution_col.info(explanation.weakest_evidence)
+
     rows = [
         {
             "Indicator": indicator.label,
+            "Weight": f"{next(item.weight for item in explanation.indicators if item.series_id == indicator.series_id):.0%}",
+            "Contribution": round(
+                next(
+                    item.weighted_points
+                    for item in explanation.indicators
+                    if item.series_id == indicator.series_id
+                ),
+                1,
+            ),
             "Score": round(indicator.score, 1),
             "Current Pressure": round(indicator.current_pressure, 1),
             "Trend": round(indicator.trend, 1),
@@ -255,6 +272,14 @@ def render_inflation() -> None:
         for indicator in result.indicators
     ]
     st.dataframe(rows, use_container_width=True, hide_index=True)
+
+    if explanation.conflicts:
+        st.warning("Conflicting signals\n\n" + "\n\n".join(explanation.conflicts))
+
+    st.caption(explanation.confidence_note)
+    with st.expander("Risks and limitations"):
+        for risk in explanation.risks:
+            st.markdown(f"- {risk}")
 
     if result.uses_imputed_data:
         dates = sorted(

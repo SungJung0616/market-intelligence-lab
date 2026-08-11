@@ -261,6 +261,10 @@ This job collects CPI and PCE data, validates it, calculates Inflation Score v1.
 publishes the result under `data/processed/inflation/`. If the run fails, the previous valid result
 remains available to the dashboard.
 
+The Inflation dashboard also provides deterministic explanations of the published result: indicator
+weights and contributions, strongest and weakest relief evidence, conflicting signals, data risks,
+and a confidence note. Explanations consume the score and never recalculate or override it.
+
 Launch the local data preview:
 
 ```powershell

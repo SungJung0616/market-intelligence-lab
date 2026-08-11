@@ -1,5 +1,14 @@
 # Analysis
 
+This package interprets completed deterministic intelligence results. It may produce explanations,
+risks, conflicting signals, and confidence notes, but it must never own, recalculate, or override
+the underlying scores.
+
+`inflation_explanation.py` provides the first rule-based explanation contract. It consumes an
+`InflationResult` and exposes a concise interpretation, weighted contributions, strongest and
+weakest evidence, conflicts, limitations, and confidence. It contains no AI calls, predictions,
+recommendations, or score calculations.
+
 Owns explainable AI interpretation, supporting and conflicting evidence, risk summaries,
 historical comparisons, and confidence estimates.
 
