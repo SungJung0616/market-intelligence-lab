@@ -14,3 +14,8 @@ committed or redistributed.
 
 The `collect_coinbase` entry point collects only public BTC-USD daily candles. It requires no
 API key, wallet, account access, or trading permission and stores only completed UTC days.
+
+`run_inflation_pipeline` is the first publish pipeline. It collects all four approved FRED price
+indexes in memory, validates and calculates Inflation Score v1.1, saves the raw series, and then
+atomically publishes a complete processed artifact. A failed run leaves the last valid processed
+result untouched.

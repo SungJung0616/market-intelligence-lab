@@ -5,12 +5,12 @@ from pathlib import Path
 
 import streamlit as st
 
-from market_intelligence_lab.intelligence.inflation import (
-    CONFIGS,
-    InflationResult,
-    calculate_inflation,
-)
 from market_intelligence_lab.presentation.series import build_figure, summarize
+from market_intelligence_lab.storage.inflation_store import (
+    InflationArtifact,
+    latest_inflation_path,
+    load_inflation_artifact,
+)
 from market_intelligence_lab.storage.json_store import latest_series_path, load_series
 
 
@@ -220,11 +220,8 @@ def render_group(previews: tuple[PreviewConfig, ...]) -> None:
             st.divider()
 
 
-def load_inflation_result(root: Path = Path("data/raw")) -> InflationResult:
-    series_by_id = {
-        series_id: load_series(latest_series_path(root, "FRED", series_id)) for series_id in CONFIGS
-    }
-    return calculate_inflation(series_by_id)
+def load_inflation_result(root: Path = Path("data/processed")) -> InflationArtifact:
+    return load_inflation_artifact(latest_inflation_path(root))
 
 
 def render_inflation() -> None:
@@ -233,11 +230,12 @@ def render_inflation() -> None:
         "Higher = Lower Inflation Pressure."
     )
     try:
-        result = load_inflation_result()
+        artifact = load_inflation_result()
     except (FileNotFoundError, ValueError) as exc:
         st.warning(f"Inflation Score unavailable: {exc}")
         return
 
+    result = artifact.result
     score_col, condition_col, pressure_col = st.columns((2, 1, 1))
     score_col.metric("Inflation Score", f"{result.score:.1f} / 100")
     condition_col.metric("Condition", result.condition)
@@ -268,7 +266,10 @@ def render_inflation() -> None:
             "Raw FRED data remains unchanged."
         )
     st.caption(
-        f"Calculation: {result.calculation_version} · Market Bias: Not calculated · "
+        f"Data as of: {artifact.data_as_of[:7]} · Updated: "
+        f"{artifact.calculated_at.isoformat(timespec='minutes')} · "
+        f"Completeness: {artifact.completeness} · Calculation: "
+        f"{result.calculation_version} · Market Bias: Not calculated · "
         "Latest revised FRED data; not vintage-safe."
     )
 

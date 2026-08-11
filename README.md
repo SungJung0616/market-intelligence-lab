@@ -251,6 +251,16 @@ uv run --env-file .env python -m market_intelligence_lab.jobs.collect_tiingo USO
 uv run python -m market_intelligence_lab.jobs.collect_coinbase
 ```
 
+Build or refresh the complete Inflation Score artifact with one command:
+
+```powershell
+uv run --env-file .env python -m market_intelligence_lab.jobs.run_inflation_pipeline
+```
+
+This job collects CPI and PCE data, validates it, calculates Inflation Score v1.1, and atomically
+publishes the result under `data/processed/inflation/`. If the run fails, the previous valid result
+remains available to the dashboard.
+
 Launch the local data preview:
 
 ```powershell
