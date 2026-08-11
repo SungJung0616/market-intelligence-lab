@@ -9,9 +9,13 @@ from market_intelligence_lab.collection.fred import FredClient
 from market_intelligence_lab.storage.json_store import save_series
 
 SUPPORTED_SERIES = {
+    "CPIAUCSL": date(2019, 1, 1),
+    "CPILFESL": date(2019, 1, 1),
     "DGS2": date(2016, 1, 1),
     "DGS10": date(2016, 1, 1),
     "DTWEXBGS": date(2016, 1, 1),
+    "PCEPI": date(2019, 1, 1),
+    "PCEPILFE": date(2019, 1, 1),
     "VIXCLS": date(2016, 1, 1),
 }
 

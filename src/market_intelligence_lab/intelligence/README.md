@@ -1,5 +1,21 @@
 # Intelligence
 
+This package owns deterministic market calculations and scoring. AI interpretation belongs in
+`analysis` and must not recalculate or override these results.
+
+## Inflation Score v1
+
+`inflation.py` combines Core PCE (35%), Core CPI (30%), Headline PCE (20%), and Headline CPI
+(15%). Each indicator is evaluated through Current Pressure (50%), Trend (30%), and Recent 5Y
+Position (20%).
+
+Higher scores mean **lower inflation pressure**. `Cooling` therefore produces a higher score;
+`Reaccelerating` produces a lower score. This is not a Risk-On/Off or investment signal.
+
+The calculation requires all four series and 64 contiguous monthly observations. Missing months
+make the combined result unavailable; values are never interpolated and weights are never silently
+renormalized. Version 1 uses latest revised FRED data and is not vintage-safe.
+
 Owns deterministic market direction, sector rotation, macro, breadth, money-flow, sentiment,
 event-risk calculations, and market scoring.
 
