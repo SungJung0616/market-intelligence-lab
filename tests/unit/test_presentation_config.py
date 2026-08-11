@@ -4,6 +4,7 @@ from market_intelligence_lab.presentation.app import (
     EQUITY_PREVIEWS,
     MACRO_PREVIEWS,
 )
+from market_intelligence_lab.intelligence.inflation import CONFIGS
 
 
 def test_dashboard_covers_approved_market_evidence() -> None:
@@ -34,3 +35,7 @@ def test_dashboard_covers_approved_market_evidence() -> None:
 def test_equity_previews_are_explicitly_representative_etfs() -> None:
     assert all("Representative ETF" in preview.title for preview in EQUITY_PREVIEWS)
     assert all("Representative ETF" in preview.title for preview in CROSS_ASSET_PREVIEWS)
+
+
+def test_inflation_dashboard_uses_all_approved_series() -> None:
+    assert set(CONFIGS) == {"CPIAUCSL", "CPILFESL", "PCEPI", "PCEPILFE"}

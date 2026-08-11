@@ -5,6 +5,11 @@ from pathlib import Path
 
 import streamlit as st
 
+from market_intelligence_lab.intelligence.inflation import (
+    CONFIGS,
+    InflationResult,
+    calculate_inflation,
+)
 from market_intelligence_lab.presentation.series import build_figure, summarize
 from market_intelligence_lab.storage.json_store import latest_series_path, load_series
 
@@ -23,24 +28,88 @@ class PreviewConfig:
 
 EQUITY_PREVIEWS = (
     PreviewConfig(
-        "Tiingo", "SPY", "S&P 500 Representative ETF", "$", "", "$", "Adjusted close", "SPY adjusted close; not the S&P 500 index itself.",
+        "Tiingo",
+        "SPY",
+        "S&P 500 Representative ETF",
+        "$",
+        "",
+        "$",
+        "Adjusted close",
+        "SPY adjusted close; not the S&P 500 index itself.",
     ),
     PreviewConfig(
-        "Tiingo", "QQQ", "Nasdaq-100 Representative ETF", "$", "", "$", "Adjusted close", "QQQ adjusted close; not the Nasdaq Composite or Nasdaq-100 index itself.",
+        "Tiingo",
+        "QQQ",
+        "Nasdaq-100 Representative ETF",
+        "$",
+        "",
+        "$",
+        "Adjusted close",
+        "QQQ adjusted close; not the Nasdaq Composite or Nasdaq-100 index itself.",
     ),
     PreviewConfig(
-        "Tiingo", "DIA", "Dow Jones Representative ETF", "$", "", "$", "Adjusted close", "DIA adjusted close; not the Dow Jones Industrial Average itself.",
+        "Tiingo",
+        "DIA",
+        "Dow Jones Representative ETF",
+        "$",
+        "",
+        "$",
+        "Adjusted close",
+        "DIA adjusted close; not the Dow Jones Industrial Average itself.",
     ),
     PreviewConfig(
-        "Tiingo", "IWM", "Russell 2000 Representative ETF", "$", "", "$", "Adjusted close", "IWM adjusted close; not the Russell 2000 index itself.",
+        "Tiingo",
+        "IWM",
+        "Russell 2000 Representative ETF",
+        "$",
+        "",
+        "$",
+        "Adjusted close",
+        "IWM adjusted close; not the Russell 2000 index itself.",
     ),
 )
 
 MACRO_PREVIEWS = (
-    PreviewConfig("FRED", "DGS10", "10-Year Treasury Rate", "", "%", "pp", "Percent", "Daily 10-year Treasury constant maturity rate."),
-    PreviewConfig("FRED", "DGS2", "2-Year Treasury Rate", "", "%", "pp", "Percent", "Daily 2-year Treasury constant maturity rate."),
-    PreviewConfig("FRED", "VIXCLS", "CBOE Volatility Index", "", "", "pts", "Index level", "Daily VIX close reported through FRED."),
-    PreviewConfig("FRED", "DTWEXBGS", "Nominal Broad U.S. Dollar Index", "", "", "pts", "Index level", "Trade-weighted broad U.S. dollar index reported through FRED."),
+    PreviewConfig(
+        "FRED",
+        "DGS10",
+        "10-Year Treasury Rate",
+        "",
+        "%",
+        "pp",
+        "Percent",
+        "Daily 10-year Treasury constant maturity rate.",
+    ),
+    PreviewConfig(
+        "FRED",
+        "DGS2",
+        "2-Year Treasury Rate",
+        "",
+        "%",
+        "pp",
+        "Percent",
+        "Daily 2-year Treasury constant maturity rate.",
+    ),
+    PreviewConfig(
+        "FRED",
+        "VIXCLS",
+        "CBOE Volatility Index",
+        "",
+        "",
+        "pts",
+        "Index level",
+        "Daily VIX close reported through FRED.",
+    ),
+    PreviewConfig(
+        "FRED",
+        "DTWEXBGS",
+        "Nominal Broad U.S. Dollar Index",
+        "",
+        "",
+        "pts",
+        "Index level",
+        "Trade-weighted broad U.S. dollar index reported through FRED.",
+    ),
 )
 
 CROSS_ASSET_PREVIEWS = (
@@ -151,20 +220,79 @@ def render_group(previews: tuple[PreviewConfig, ...]) -> None:
             st.divider()
 
 
+def load_inflation_result(root: Path = Path("data/raw")) -> InflationResult:
+    series_by_id = {
+        series_id: load_series(latest_series_path(root, "FRED", series_id)) for series_id in CONFIGS
+    }
+    return calculate_inflation(series_by_id)
+
+
+def render_inflation() -> None:
+    st.caption(
+        "A deterministic reading of inflation pressure—not a prediction or market signal. "
+        "Higher = Lower Inflation Pressure."
+    )
+    try:
+        result = load_inflation_result()
+    except (FileNotFoundError, ValueError) as exc:
+        st.warning(f"Inflation Score unavailable: {exc}")
+        return
+
+    score_col, condition_col, pressure_col = st.columns((2, 1, 1))
+    score_col.metric("Inflation Score", f"{result.score:.1f} / 100")
+    condition_col.metric("Condition", result.condition)
+    pressure_col.metric("Inflation Pressure", result.pressure_label)
+    st.progress(result.score / 100)
+
+    rows = [
+        {
+            "Indicator": indicator.label,
+            "Score": round(indicator.score, 1),
+            "Current Pressure": round(indicator.current_pressure, 1),
+            "Trend": round(indicator.trend, 1),
+            "Recent 5Y Position": round(indicator.recent_5y_position, 1),
+            "Condition": indicator.regime,
+            "Reference Month": indicator.reference_date[:7],
+        }
+        for indicator in result.indicators
+    ]
+    st.dataframe(rows, use_container_width=True, hide_index=True)
+
+    if result.uses_imputed_data:
+        dates = sorted(
+            {date for indicator in result.indicators for date in indicator.imputed_dates}
+        )
+        st.warning(
+            "Estimated official structural gap: "
+            f"{', '.join(dates)} CPI values use the geometric mean of adjacent months. "
+            "Raw FRED data remains unchanged."
+        )
+    st.caption(
+        f"Calculation: {result.calculation_version} · Market Bias: Not calculated · "
+        "Latest revised FRED data; not vintage-safe."
+    )
+
+
 st.set_page_config(page_title="Market Intelligence Lab", page_icon="📈", layout="wide")
 st.title("Market Intelligence Lab")
 st.caption("Simple on the surface. Rigorous underneath.")
 
-equities_tab, macro_tab, cross_asset_tab, bitcoin_tab = st.tabs(
+inflation_tab, equities_tab, macro_tab, cross_asset_tab, bitcoin_tab = st.tabs(
     [
+        "Inflation Score",
         "U.S. Market ETFs",
         "Rates, Volatility & Dollar",
         "Cross-Asset Evidence",
         "Bitcoin Evidence",
     ]
 )
+with inflation_tab:
+    render_inflation()
+
 with equities_tab:
-    st.caption("Liquid representative ETFs are used as observable market evidence—not as index substitutes or investment recommendations.")
+    st.caption(
+        "Liquid representative ETFs are used as observable market evidence—not as index substitutes or investment recommendations."
+    )
     render_group(EQUITY_PREVIEWS)
 
 with macro_tab:
