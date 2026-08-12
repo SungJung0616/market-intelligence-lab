@@ -19,3 +19,8 @@ API key, wallet, account access, or trading permission and stores only completed
 indexes in memory, validates and calculates Inflation Score v1.1, saves the raw series, and then
 atomically publishes a complete processed artifact. A failed run leaves the last valid processed
 result untouched.
+
+`run_daily_refresh` runs the approved Inflation, macro FRED, Tiingo ETF, cross-asset, and Bitcoin
+refreshes with one command. Each task is isolated so one provider failure does not stop remaining
+work. A lock rejects concurrent runs, and the command exits non-zero after recording any partial
+failure so a future scheduler can detect it.

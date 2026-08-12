@@ -265,6 +265,17 @@ The Inflation dashboard also provides deterministic explanations of the publishe
 weights and contributions, strongest and weakest relief evidence, conflicting signals, data risks,
 and a confidence note. Explanations consume the score and never recalculate or override it.
 
+Refresh all currently approved market evidence once:
+
+```powershell
+uv run --env-file .env python -m market_intelligence_lab.jobs.run_daily_refresh
+```
+
+The command refreshes Inflation, rates, volatility, the dollar, U.S. market ETFs, cross-asset ETFs,
+and completed Bitcoin daily candles. Independent failures are reported without stopping later
+tasks, and existing valid artifacts remain available. The latest secret-safe run summary is stored
+under `data/processed/refresh/latest.json`. Scheduling this command is a separate future step.
+
 Launch the local data preview:
 
 ```powershell

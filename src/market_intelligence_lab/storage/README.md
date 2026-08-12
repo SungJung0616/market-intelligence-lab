@@ -12,3 +12,6 @@ research data and are not committed.
 The inflation store atomically publishes validated results to
 `data/processed/inflation/<data-as-of>.json`. The dashboard reads this processed contract instead
 of calculating scores from raw files. Temporary or incomplete artifacts are never presented.
+
+Daily refresh status is atomically written to `data/processed/refresh/latest.json`. It records task
+names, destinations, timestamps, and exception types but never exception messages or credentials.
