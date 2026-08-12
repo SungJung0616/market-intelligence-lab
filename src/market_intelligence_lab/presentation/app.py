@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from pathlib import Path
+import subprocess
 
 import streamlit as st
 
@@ -13,6 +14,7 @@ from market_intelligence_lab.storage.inflation_store import (
     load_inflation_artifact,
 )
 from market_intelligence_lab.storage.json_store import latest_series_path, load_series
+from market_intelligence_lab.storage.refresh_store import load_refresh_status
 
 
 @dataclass(frozen=True, slots=True)
@@ -184,6 +186,22 @@ def _format_value(value: float, config: PreviewConfig) -> str:
     return f"{config.value_prefix}{value:.2f}{config.value_suffix}"
 
 
+def _provider_status(config: PreviewConfig) -> str:
+    task_name = {
+        "FRED": f"fred:{config.series_id}",
+        "Tiingo": f"tiingo:{config.series_id}",
+        "Coinbase": f"coinbase:{config.series_id}",
+    }[config.source]
+    try:
+        status = load_refresh_status()
+    except (FileNotFoundError, ValueError):
+        return "Not checked"
+    task = next((item for item in status.tasks if item.name == task_name), None)
+    if task is None:
+        return "Not checked"
+    return "Latest available" if task.status == "success" else "Refresh failed"
+
+
 def render_preview(config: PreviewConfig) -> None:
     st.subheader(f"{config.title} · {config.series_id}")
     try:
@@ -195,7 +213,7 @@ def render_preview(config: PreviewConfig) -> None:
         return
 
     latest = series.observations[-1]
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     col1.metric(
         "Latest",
         _format_value(summary.latest, config),
@@ -203,6 +221,7 @@ def render_preview(config: PreviewConfig) -> None:
     )
     col2.metric("Historical mean", _format_value(summary.historical_mean, config))
     col3.metric("Latest observation", latest.date.isoformat())
+    col4.metric("Provider status", _provider_status(config))
     st.plotly_chart(
         build_figure(series, summary.historical_mean, config.yaxis_title),
         use_container_width=True,
@@ -210,8 +229,45 @@ def render_preview(config: PreviewConfig) -> None:
     )
     st.caption(
         f"{config.note} Source: {series.source} · {len(series.observations):,} observations · "
-        f"Collected {series.collected_at.date().isoformat()}"
+        f"Last checked {series.collected_at.astimezone().isoformat(timespec='minutes')}"
     )
+
+
+def run_manual_refresh() -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [
+            "uv",
+            "run",
+            "--env-file",
+            ".env",
+            "python",
+            "-m",
+            "market_intelligence_lab.jobs.run_daily_refresh",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+
+def render_refresh_control() -> None:
+    status_col, action_col = st.columns((3, 1))
+    try:
+        status = load_refresh_status()
+        status_col.caption(
+            f"Last refresh: {status.finished_at.astimezone().isoformat(timespec='minutes')} · "
+            f"{status.status} · {status.succeeded} succeeded / {status.failed} failed"
+        )
+    except (FileNotFoundError, ValueError):
+        status_col.caption("No Daily Refresh status is available yet.")
+    if action_col.button("Refresh Now", type="primary", use_container_width=True):
+        with st.spinner("Refreshing all market evidence..."):
+            completed = run_manual_refresh()
+        if completed.returncode == 0:
+            st.success("Daily Market Refresh completed successfully.")
+        else:
+            st.error("Daily Market Refresh completed with failures. Previous valid data was kept.")
+        st.rerun()
 
 
 def render_group(previews: tuple[PreviewConfig, ...]) -> None:
@@ -302,6 +358,7 @@ def render_inflation() -> None:
 st.set_page_config(page_title="Market Intelligence Lab", page_icon="📈", layout="wide")
 st.title("Market Intelligence Lab")
 st.caption("Simple on the surface. Rigorous underneath.")
+render_refresh_control()
 
 inflation_tab, equities_tab, macro_tab, cross_asset_tab, bitcoin_tab = st.tabs(
     [

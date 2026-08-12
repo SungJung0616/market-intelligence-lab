@@ -1,5 +1,10 @@
 # Presentation
 
+The Streamlit dashboard displays completed processed results and collected evidence. It shows the
+latest observation separately from the last provider check, plus the latest Daily Refresh summary.
+The local-only **Refresh Now** button invokes the existing command-line pipeline; presentation code
+does not duplicate collection or scoring logic.
+
 Owns human-facing research views, beginning with the approved Streamlit dashboard.
 
 This package may coordinate application use cases but must not contain data-provider,

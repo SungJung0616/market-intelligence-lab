@@ -43,6 +43,24 @@ def save_refresh_status(
     return destination
 
 
+def load_refresh_status(
+    root: Path = Path("data/processed"),
+) -> DailyRefreshStatus:
+    path = root / "refresh" / "latest.json"
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    try:
+        return DailyRefreshStatus(
+            started_at=datetime.fromisoformat(payload["started_at"]),
+            finished_at=datetime.fromisoformat(payload["finished_at"]),
+            status=str(payload["status"]),
+            succeeded=int(payload["succeeded"]),
+            failed=int(payload["failed"]),
+            tasks=tuple(RefreshTaskResult(**item) for item in payload["tasks"]),
+        )
+    except (KeyError, TypeError, ValueError) as exc:
+        raise ValueError(f"Invalid refresh status: {path}") from exc
+
+
 def _json_default(value: object) -> str:
     if isinstance(value, datetime):
         return value.isoformat()

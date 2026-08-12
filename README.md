@@ -274,7 +274,12 @@ uv run --env-file .env python -m market_intelligence_lab.jobs.run_daily_refresh
 The command refreshes Inflation, rates, volatility, the dollar, U.S. market ETFs, cross-asset ETFs,
 and completed Bitcoin daily candles. Independent failures are reported without stopping later
 tasks, and existing valid artifacts remain available. The latest secret-safe run summary is stored
-under `data/processed/refresh/latest.json`. Scheduling this command is a separate future step.
+under `data/processed/refresh/latest.json`.
+
+The local dashboard includes a **Refresh Now** button that runs the same locked pipeline. On this
+Windows workstation, `scripts/run_daily_refresh.ps1` is also registered as **Market Intelligence
+Lab Daily Refresh** at 3:00 PM local Pacific time. The task runs when the PC is available and starts
+later if the scheduled time was missed while the PC was unavailable.
 
 Launch the local data preview:
 
