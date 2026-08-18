@@ -261,6 +261,26 @@ This job collects CPI and PCE data, validates it, calculates Inflation Score v1.
 publishes the result under `data/processed/inflation/`. If the run fails, the previous valid result
 remains available to the dashboard.
 
+Collect the approved official labor series and generate a descriptive distribution report:
+
+```powershell
+uv run --env-file .env python -m market_intelligence_lab.jobs.run_labor_research
+```
+
+This research job stores seven raw FRED dependencies and publishes candidate-signal distributions
+under `data/processed/labor_research/`. It does **not** calculate or approve a Labor Health Score.
+The output includes current values, historical quantiles, recent five-year positions, pandemic
+distortion comparisons, and explicit `scoring_approved: false` and `vintage_safe: false` flags.
+The approved scoring curves are documented in `docs/research/labor-scoring-v1-proposal.md` and are
+implemented as deterministic Labor Intelligence v1.0. Build or refresh the processed score with:
+
+```powershell
+uv run --env-file .env python -m market_intelligence_lab.jobs.run_labor_pipeline
+```
+
+Labor Health and Wage Pressure are separate outputs. Neither calculates market direction,
+recession certainty, or an investment recommendation.
+
 The Inflation dashboard also provides deterministic explanations of the published result: indicator
 weights and contributions, strongest and weakest relief evidence, conflicting signals, data risks,
 and a confidence note. Explanations consume the score and never recalculate or override it.

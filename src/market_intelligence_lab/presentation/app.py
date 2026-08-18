@@ -7,6 +7,7 @@ import subprocess
 import streamlit as st
 
 from market_intelligence_lab.analysis.inflation_explanation import explain_inflation
+from market_intelligence_lab.analysis.labor_explanation import explain_labor
 from market_intelligence_lab.presentation.series import build_figure, summarize
 from market_intelligence_lab.storage.inflation_store import (
     InflationArtifact,
@@ -14,6 +15,11 @@ from market_intelligence_lab.storage.inflation_store import (
     load_inflation_artifact,
 )
 from market_intelligence_lab.storage.json_store import latest_series_path, load_series
+from market_intelligence_lab.storage.labor_store import (
+    LaborArtifact,
+    latest_labor_path,
+    load_labor_artifact,
+)
 from market_intelligence_lab.storage.refresh_store import load_refresh_status
 
 
@@ -286,6 +292,7 @@ def render_inflation() -> None:
         "A deterministic reading of inflation pressure—not a prediction or market signal. "
         "Higher = Lower Inflation Pressure."
     )
+
     try:
         artifact = load_inflation_result()
     except (FileNotFoundError, ValueError) as exc:
@@ -355,14 +362,88 @@ def render_inflation() -> None:
     )
 
 
+def load_labor_result(root: Path = Path("data/processed")) -> LaborArtifact:
+    return load_labor_artifact(latest_labor_path(root))
+
+
+def render_labor() -> None:
+    st.caption(
+        "A deterministic reading of U.S. labor-market health—not a market signal. "
+        "Higher = healthier and more resilient labor conditions."
+    )
+    try:
+        artifact = load_labor_result()
+    except (FileNotFoundError, ValueError) as exc:
+        st.warning(f"Labor Intelligence unavailable: {exc}")
+        return
+
+    result = artifact.result
+    score_col, condition_col, direction_col, wage_col = st.columns((2, 1, 1, 1))
+    score_col.metric("Labor Health", f"{result.score:.1f} / 100")
+    condition_col.metric("Condition", result.condition)
+    direction_col.metric("Direction", result.direction)
+    wage_col.metric(
+        "Wage Pressure",
+        f"{result.wage_pressure.score:.1f} / 100",
+        result.wage_pressure.trend,
+    )
+    st.progress(result.score / 100)
+
+    explanation = explain_labor(result)
+    st.subheader("Why this score?")
+    st.markdown(f"**{explanation.headline}** {explanation.summary}")
+    evidence_col, caution_col = st.columns(2)
+    evidence_col.success(explanation.strongest_evidence)
+    caution_col.info(explanation.weakest_evidence)
+
+    rows = [
+        {
+            "Component": component.label,
+            "Weight": f"{component.weight:.0%}",
+            "Contribution": round(component.weighted_points, 1),
+            "Score": round(component.score, 1),
+            "Level Score": round(component.level_score, 1),
+            "Trend Score": round(component.trend_score, 1),
+            "Recent 5Y Percentile": round(component.recent_5y_percentile, 1),
+            "Reference Period": component.reference_date,
+            "Flags": ", ".join(component.flags) or "None",
+        }
+        for component in result.components
+    ]
+    st.dataframe(rows, use_container_width=True, hide_index=True)
+
+    wage = result.wage_pressure
+    st.subheader("Wage Pressure · Separate Signal")
+    wage_col1, wage_col2, wage_col3, wage_col4 = st.columns(4)
+    wage_col1.metric("AHE YoY", f"{wage.yoy:.2f}%")
+    wage_col2.metric("AHE 3M Annualized", f"{wage.annualized_3m:.2f}%")
+    wage_col3.metric("Momentum Gap", f"{wage.momentum_gap:+.2f} pp")
+    wage_col4.metric("Pressure", wage.pressure_label)
+
+    if explanation.conflicts:
+        st.warning("Conflicting signals\n\n" + "\n\n".join(explanation.conflicts))
+    st.caption(explanation.confidence_note)
+    with st.expander("Risks and limitations"):
+        for risk in explanation.risks:
+            st.markdown(f"- {risk}")
+    st.caption(
+        f"Data as of: {artifact.data_as_of} · Updated: "
+        f"{artifact.calculated_at.isoformat(timespec='minutes')} · "
+        f"Completeness: {artifact.completeness} · Calculation: "
+        f"{result.calculation_version} · Market Bias: Not calculated · "
+        "Latest revised FRED data; not vintage-safe."
+    )
+
+
 st.set_page_config(page_title="Market Intelligence Lab", page_icon="📈", layout="wide")
 st.title("Market Intelligence Lab")
 st.caption("Simple on the surface. Rigorous underneath.")
 render_refresh_control()
 
-inflation_tab, equities_tab, macro_tab, cross_asset_tab, bitcoin_tab = st.tabs(
+inflation_tab, labor_tab, equities_tab, macro_tab, cross_asset_tab, bitcoin_tab = st.tabs(
     [
         "Inflation Score",
+        "Labor Intelligence",
         "U.S. Market ETFs",
         "Rates, Volatility & Dollar",
         "Cross-Asset Evidence",
@@ -371,6 +452,9 @@ inflation_tab, equities_tab, macro_tab, cross_asset_tab, bitcoin_tab = st.tabs(
 )
 with inflation_tab:
     render_inflation()
+
+with labor_tab:
+    render_labor()
 
 with equities_tab:
     st.caption(

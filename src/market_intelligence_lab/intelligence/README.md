@@ -23,6 +23,18 @@ the imputed date and a data-quality note. Any other missing month remains an err
 
 Version 1.1 uses latest revised FRED data and is not vintage-safe.
 
+## Labor Intelligence v1
+
+`labor_distribution.py` transforms seven official FRED dependencies into descriptive candidate
+metrics. `labor.py` alone owns the approved Labor Health calculation: Payroll Momentum (30%),
+Unemployment Health (30%), Initial Claims (25%), and JOLTS Demand (15%). Higher means healthier
+and more resilient labor conditions.
+
+Wage Pressure is calculated and reported separately; it never contributes to Labor Health. Recent
+5Y percentiles are explanatory context only. Labor Intelligence does not infer Risk-On/Off,
+recession certainty, stock direction, or an investment recommendation. Version 1.0 uses latest
+revised FRED data and is not vintage-safe.
+
 Owns deterministic market direction, sector rotation, macro, breadth, money-flow, sentiment,
 event-risk calculations, and market scoring.
 

@@ -14,6 +14,7 @@ from market_intelligence_lab.jobs.collect_coinbase import OBSERVATION_START, PRO
 from market_intelligence_lab.jobs.collect_fred import SUPPORTED_SERIES
 from market_intelligence_lab.jobs.collect_tiingo import SUPPORTED_TICKERS
 from market_intelligence_lab.jobs.run_inflation_pipeline import run_pipeline
+from market_intelligence_lab.jobs.run_labor_pipeline import run_pipeline as run_labor_pipeline
 from market_intelligence_lab.storage.json_store import save_series
 from market_intelligence_lab.storage.refresh_store import (
     DailyRefreshStatus,
@@ -41,7 +42,11 @@ def build_tasks(
         RefreshTask(
             "inflation",
             lambda: run_pipeline(fred, raw_root=raw_root, processed_root=processed_root),
-        )
+        ),
+        RefreshTask(
+            "labor",
+            lambda: run_labor_pipeline(fred, raw_root=raw_root, processed_root=processed_root),
+        ),
     ]
     tasks.extend(_fred_refresh_task(fred, series_id, raw_root) for series_id in MACRO_SERIES)
     tasks.extend(_tiingo_refresh_task(tiingo, ticker, raw_root) for ticker in SUPPORTED_TICKERS)
