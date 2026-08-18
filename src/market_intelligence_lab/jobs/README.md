@@ -20,7 +20,11 @@ indexes in memory, validates and calculates Inflation Score v1.1, saves the raw 
 atomically publishes a complete processed artifact. A failed run leaves the last valid processed
 result untouched.
 
-`run_daily_refresh` runs the approved Inflation, macro FRED, Tiingo ETF, cross-asset, and Bitcoin
+`run_labor_research` publishes descriptive distributions without a score. `run_labor_pipeline`
+collects the same approved dependencies, calculates Labor Intelligence v1.0, and atomically
+publishes the complete processed result. A failed run preserves the last valid result.
+
+`run_daily_refresh` runs the approved Inflation, Labor, macro FRED, Tiingo ETF, cross-asset, and Bitcoin
 refreshes with one command. Each task is isolated so one provider failure does not stop remaining
 work. A lock rejects concurrent runs, and the command exits non-zero after recording any partial
 failure so a future scheduler can detect it.

@@ -9,6 +9,10 @@ the underlying scores.
 weakest evidence, conflicts, limitations, and confidence. It contains no AI calls, predictions,
 recommendations, or score calculations.
 
+`labor_explanation.py` consumes a completed `LaborResult` and identifies strongest and weakest
+evidence, conflicting signals, risk flags, revision limitations, and confidence. Wage Pressure is
+explained as a separate dimension and the explanation never recalculates Labor Health.
+
 Owns explainable AI interpretation, supporting and conflicting evidence, risk summaries,
 historical comparisons, and confidence estimates.
 
